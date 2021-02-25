@@ -1,5 +1,5 @@
-import styled, {createGlobalStyle} from 'styled-components';
-import BGImage from './images/background1.jpg';
+import styled, { createGlobalStyle } from "styled-components";
+import BGImage from "./images/background1.jpg";
 
 export const GlobalStyle = createGlobalStyle`
   html {
@@ -29,7 +29,34 @@ export const Wrapper = styled.div`
   .score {
     color: #fff;
     font-size: 2rem;
-    margin: 0;
+    margin-top: 10px;
+  }
+  .cog {
+    cursor: pointer;
+    color: white;
+  }
+  .modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .box {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+  }
+  .titleWrapper {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .startWrapper {
+    display: flex;
+    width: 100%;
+    height: 80px;
+    align-items: center;
+    justify-content: center;
   }
   h1 {
     font-family: Fascinate Inline;
@@ -46,7 +73,8 @@ export const Wrapper = styled.div`
     text-align: center;
     margin: 20px;
   }
-  .start, .next {
+  .start,
+  .next {
     cursor: pointer;
     background: linear-gradient(180deg, #ffffff, #ffcc91);
     border: 2px solid #d38558;
@@ -58,5 +86,9 @@ export const Wrapper = styled.div`
   }
   .start {
     max-width: 200px;
+  }
+  .btn-primary {
+    margin: 10px;
+    width:124px
   }
 `;

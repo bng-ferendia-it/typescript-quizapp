@@ -1,103 +1,149 @@
-import React, {useState} from 'react';
-import {fetchQuizQuestions} from './service/API';
+import React, { useState } from "react";
+import { fetchQuizQuestions } from "./service/API";
 // Components
-import QuestionCard from './components/QuestionCard';
+import QuestionCard from "./components/QuestionCard";
 // types
-import {QuestionState, Difficulty} from './service/API';
+import { QuestionState } from "./service/API";
 // Styles
-import {GlobalStyle, Wrapper} from './App.styles';
+import { GlobalStyle, Wrapper } from "./App.styles";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Dropdown from "react-bootstrap/Dropdown";
+import Button from "react-bootstrap/Button";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export type AnswerObject = {
-    question: string;
-    answer: string;
-    correct: boolean;
-    correctAnswer: string;
+  question: string;
+  answer: string;
+  correct: boolean;
+  correctAnswer: string;
 };
 
 const TOTAL_QUESTIONS = 10;
 
 const App: React.FC = () => {
-    const [loading, setLoading] = useState(false);
-    const [questions, setQuestions] = useState<QuestionState[]>([]);
-    const [number, setNumber] = useState(0);
-    const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([]);
-    const [score, setScore] = useState(0);
-    const [gameOver, setGameOver] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [questions, setQuestions] = useState<QuestionState[]>([]);
+  const [number, setNumber] = useState(0);
+  const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([]);
+  const [score, setScore] = useState(0);
+  const [gameOver, setGameOver] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [difficulty, setDifficulty] = useState("medium");
 
-    const startTrivia = async () => {
-        setLoading(true);
-        setGameOver(false);
-        const newQuestions = await fetchQuizQuestions(
-            TOTAL_QUESTIONS,
-            Difficulty.MEDIUM
-        );
-        setQuestions(newQuestions);
-        setScore(0);
-        setUserAnswers([]);
-        setNumber(0);
-        setLoading(false);
-    };
+  const startTrivia = async () => {
+    setLoading(true);
+    setGameOver(false);
+    const newQuestions = await fetchQuizQuestions(TOTAL_QUESTIONS, difficulty);
+    setQuestions(newQuestions);
+    setScore(0);
+    setUserAnswers([]);
+    setNumber(0);
+    setLoading(false);
+  };
 
-    const checkAnswer = (e: any) => {
-        if (!gameOver) {
-            // User's answer
-            const answer = e.currentTarget.value;
-            // Check answer against correct answer
-            const correct = questions[number].correct_answer === answer;
-            // Add score if answer is correct
-            if (correct) setScore((prev) => prev + 1);
-            // Save the answer in the array for user answers
-            const answerObject = {
-                question: questions[number].question,
-                answer,
-                correct,
-                correctAnswer: questions[number].correct_answer,
-            };
-            setUserAnswers((prev) => [...prev, answerObject]);
-        }
-    };
+  const checkAnswer = (e: any) => {
+    if (!gameOver) {
+      // User's answer
+      const answer = e.currentTarget.value;
+      // Check answer against correct answer
+      const correct = questions[number].correct_answer === answer;
+      // Add score if answer is correct
+      if (correct) setScore((prev) => prev + 1);
+      // Save the answer in the array for user answers
+      const answerObject = {
+        question: questions[number].question,
+        answer,
+        correct,
+        correctAnswer: questions[number].correct_answer,
+      };
+      setUserAnswers((prev) => [...prev, answerObject]);
+    }
+  };
 
-    const nextQuestion = () => {
-        // Move on to the next question if not the last question
-        const nextQ = number + 1;
+  const nextQuestion = () => {
+    // Move on to the next question if not the last question
+    const nextQ = number + 1;
 
-        if (nextQ === TOTAL_QUESTIONS) {
-            setGameOver(true);
-        } else {
-            setNumber(nextQ);
-        }
-    };
+    if (nextQ === TOTAL_QUESTIONS) {
+      setGameOver(true);
+    } else {
+      setNumber(nextQ);
+    }
+  };
 
-    return (
-        <>
-            <GlobalStyle/>
-            <Wrapper>
-                <h1>REACT POLITICS QUIZ</h1>
-                {gameOver || userAnswers.length === TOTAL_QUESTIONS ? (
-                    <button className='start' onClick={startTrivia}>
-                        Start
-                    </button>
-                ) : null}
-                {!gameOver ? <p className='score'>Score: {score}</p> : null}
-                {loading ? <p>Loading Questions...</p> : null}
-                {!loading && !gameOver && (
-                    <QuestionCard
-                        questionNr={number + 1}
-                        totalQuestions={TOTAL_QUESTIONS}
-                        question={questions[number].question}
-                        answers={questions[number].answers}
-                        userAnswer={userAnswers ? userAnswers[number] : undefined}
-                        callback={checkAnswer}
-                    />
-                )}
-                {!gameOver && !loading && userAnswers.length === number + 1 && number !== TOTAL_QUESTIONS - 1 ? (
-                    <button className='next' onClick={nextQuestion}>
-                        Next Question
-                    </button>
-                ) : null}
-            </Wrapper>
-        </>
-    );
+  const selectNormal = () => {
+    setDifficulty("medium");
+  };
+  const selectHard = () => {
+    setDifficulty("hard");
+  };
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <GlobalStyle />
+      <Wrapper>
+        <h1>REACT POLITICS QUIZ</h1>
+        <div className="startWrapper">
+          {gameOver || userAnswers.length === TOTAL_QUESTIONS ? (
+            <>
+              <Button variant="primary" onClick={startTrivia}>
+                Start
+              </Button>
+              <DropdownButton id="dropdown-item-button" title="Difficulty">
+                <Dropdown.Item as="button" onClick={selectNormal}>
+                  Normal
+                </Dropdown.Item>
+                <Dropdown.Item as="button" onClick={selectHard}>
+                  Hard
+                </Dropdown.Item>
+              </DropdownButton>
+            </>
+          ) : (
+            <>
+              <Button variant="primary" onClick={startTrivia} disabled>
+                Start
+              </Button>
+              <DropdownButton
+                id="dropdown-item-button"
+                className="dropdownButton"
+                title="Difficulty"
+                disabled
+              />
+            </>
+          )}
+        </div>
+        {!gameOver ? <p className="score">Score: {score}</p> : null}
+        {loading ? <p>Loading Questions...</p> : null}
+        {!loading && !gameOver && (
+          <QuestionCard
+            questionNr={number + 1}
+            totalQuestions={TOTAL_QUESTIONS}
+            question={questions[number].question}
+            answers={questions[number].answers}
+            userAnswer={userAnswers ? userAnswers[number] : undefined}
+            callback={checkAnswer}
+          />
+        )}
+        {!gameOver &&
+        !loading &&
+        userAnswers.length === number + 1 &&
+        number !== TOTAL_QUESTIONS - 1 ? (
+          <Button variant="primary" onClick={nextQuestion}>
+            Next question
+          </Button>
+        ) : null}
+      </Wrapper>
+    </>
+  );
 };
 
 export default App;

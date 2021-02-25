@@ -11,11 +11,6 @@ import {shuffleArray} from "../utils";
 /**
  * Question difficulty enum used for fetching easier or more difficult questions over the API endpoint.
  */
-export enum Difficulty {
-    EASY = "easy",
-    MEDIUM = "medium",
-    HARD = "hard",
-}
 
 /**
  * The question object.
@@ -42,7 +37,7 @@ export type QuestionState = Question & { answers: string[] };
  */
 export const fetchQuizQuestions = async (
     amount: number,
-    difficulty: Difficulty
+    difficulty: string
 ) => {
     const endpoint = `https://opentdb.com/api.php?amount=${amount}&category=24&difficulty=${difficulty}&type=multiple`;
     const data = await (await fetch(endpoint)).json();
